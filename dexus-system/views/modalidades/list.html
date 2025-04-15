@@ -1,0 +1,343 @@
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Modalidades</h1>
+        <button id="btn-nova-modalidade" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Nova Modalidade
+        </button>
+    </div>
+
+    <!-- Cartão de Pesquisa -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-codigo">Código:</label>
+                        <input type="text" class="form-control" id="filtro-codigo">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="filtro-descricao">Descrição:</label>
+                        <input type="text" class="form-control" id="filtro-descricao">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" id="btn-filtrar" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <button type="button" id="btn-limpar-filtro" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartão de Resultados -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Modalidades Cadastradas</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="tabela-modalidades" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descrição</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="placeholder-row">
+                            <td colspan="3" class="text-center">Carregando dados...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <p id="info-paginacao">Exibindo 0 de 0 registros</p>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="Navegação de página">
+                        <ul class="pagination justify-content-end" id="paginacao">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Próximo</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modal-confirma-exclusao" tabindex="-1" aria-labelledby="modal-confirma-exclusao-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-confirma-exclusao-label">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja realmente excluir a modalidade <strong id="nome-modalidade-exclusao"></strong>?</p>
+                <p class="text-danger">Esta ação não poderá ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirma-exclusao">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para a listagem de modalidades
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar eventos dos botões
+        document.getElementById('btn-nova-modalidade').addEventListener('click', function() {
+            loadModalidadeForm();
+        });
+        
+        document.getElementById('btn-filtrar').addEventListener('click', function() {
+            carregarModalidades(1);
+        });
+        
+        document.getElementById('btn-limpar-filtro').addEventListener('click', function() {
+            // Limpar campos de filtro
+            document.getElementById('filtro-codigo').value = '';
+            document.getElementById('filtro-descricao').value = '';
+            
+            // Recarregar dados
+            carregarModalidades(1);
+        });
+        
+        // Carregar dados iniciais
+        carregarModalidades(1);
+    });
+    
+    // Função para carregar a lista de modalidades
+    function carregarModalidades(pagina = 1) {
+        // Obter parâmetros de filtro
+        const filtros = {
+            pagina: pagina,
+            codigo: document.getElementById('filtro-codigo').value,
+            descricao: document.getElementById('filtro-descricao').value
+        };
+        
+        // Exibir loader
+        document.querySelector('#tabela-modalidades tbody').innerHTML = `
+            <tr class="placeholder-row">
+                <td colspan="3" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        // Buscar dados na API
+        fetchModalidades(filtros)
+            .then(data => {
+                // Limpar tabela
+                document.querySelector('#tabela-modalidades tbody').innerHTML = '';
+                
+                // Verificar se há resultados
+                if (data.modalidades && data.modalidades.length > 0) {
+                    // Adicionar linhas à tabela
+                    data.modalidades.forEach(modalidade => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${modalidade.MODCOD}</td>
+                            <td>${modalidade.MODDES}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-info" onclick="visualizarModalidade(${modalidade.MODCOD})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="editarModalidade(${modalidade.MODCOD})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmarExclusaoModalidade(${modalidade.MODCOD}, '${modalidade.MODDES}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        document.querySelector('#tabela-modalidades tbody').appendChild(row);
+                    });
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 
+                        `Exibindo ${data.inicio} a ${data.fim} de ${data.total} registros`;
+                    
+                    // Atualizar controles de paginação
+                    atualizarPaginacao(data.paginaAtual, data.totalPaginas);
+                } else {
+                    // Exibir mensagem de nenhum resultado
+                    document.querySelector('#tabela-modalidades tbody').innerHTML = `
+                        <tr>
+                            <td colspan="3" class="text-center">Nenhuma modalidade encontrada</td>
+                        </tr>
+                    `;
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 'Exibindo 0 de 0 registros';
+                    
+                    // Limpar paginação
+                    document.getElementById('paginacao').innerHTML = '';
+                }
+            })
+            .catch(error => {
+                // Exibir mensagem de erro
+                document.querySelector('#tabela-modalidades tbody').innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center text-danger">Erro ao carregar dados: ${error.message}</td>
+                    </tr>
+                `;
+                
+                showAlert('Erro ao carregar modalidades: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para atualizar os controles de paginação
+    function atualizarPaginacao(paginaAtual, totalPaginas) {
+        const paginacao = document.getElementById('paginacao');
+        paginacao.innerHTML = '';
+        
+        // Botão "Anterior"
+        const liAnterior = document.createElement('li');
+        liAnterior.className = `page-item ${paginaAtual === 1 ? 'disabled' : ''}`;
+        
+        const linkAnterior = document.createElement('a');
+        linkAnterior.className = 'page-link';
+        linkAnterior.href = '#';
+        linkAnterior.textContent = 'Anterior';
+        
+        if (paginaAtual > 1) {
+            linkAnterior.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarModalidades(paginaAtual - 1);
+            });
+        }
+        
+        liAnterior.appendChild(linkAnterior);
+        paginacao.appendChild(liAnterior);
+        
+        // Páginas numéricas
+        let inicio = Math.max(1, paginaAtual - 2);
+        let fim = Math.min(totalPaginas, inicio + 4);
+        
+        if (fim - inicio < 4 && inicio > 1) {
+            inicio = Math.max(1, fim - 4);
+        }
+        
+        for (let i = inicio; i <= fim; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === paginaAtual ? 'active' : ''}`;
+            
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.textContent = i;
+            
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarModalidades(i);
+            });
+            
+            li.appendChild(link);
+            paginacao.appendChild(li);
+        }
+        
+        // Botão "Próximo"
+        const liProximo = document.createElement('li');
+        liProximo.className = `page-item ${paginaAtual === totalPaginas ? 'disabled' : ''}`;
+        
+        const linkProximo = document.createElement('a');
+        linkProximo.className = 'page-link';
+        linkProximo.href = '#';
+        linkProximo.textContent = 'Próximo';
+        
+        if (paginaAtual < totalPaginas) {
+            linkProximo.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarModalidades(paginaAtual + 1);
+            });
+        }
+        
+        liProximo.appendChild(linkProximo);
+        paginacao.appendChild(liProximo);
+    }
+    
+    // Função para visualizar uma modalidade
+    function visualizarModalidade(id) {
+        loadModalidadeForm(id, 'visualizar');
+    }
+    
+    // Função para editar uma modalidade
+    function editarModalidade(id) {
+        loadModalidadeForm(id, 'editar');
+    }
+    
+    // Função para confirmar exclusão de modalidade
+    function confirmarExclusaoModalidade(id, nome) {
+        // Preencher nome da modalidade no modal
+        document.getElementById('nome-modalidade-exclusao').textContent = nome;
+        
+        // Configurar botão de confirmação
+        document.getElementById('btn-confirma-exclusao').onclick = function() {
+            excluirModalidade(id);
+        };
+        
+        // Exibir modal
+        const modal = new bootstrap.Modal(document.getElementById('modal-confirma-exclusao'));
+        modal.show();
+    }
+    
+    // Função para excluir uma modalidade
+    function excluirModalidade(id) {
+        // Verificar se a modalidade pode ser excluída
+        canDeleteModalidade(id)
+            .then(data => {
+                if (data.canDelete) {
+                    // Realizar exclusão
+                    return deleteModalidade(id);
+                } else {
+                    // Exibir mensagem de erro
+                    throw new Error(data.message || 'Esta modalidade não pode ser excluída porque está vinculada a clientes ou ordens de serviço.');
+                }
+            })
+            .then(data => {
+                // Fechar modal
+                bootstrap.Modal.getInstance(document.getElementById('modal-confirma-exclusao')).hide();
+                
+                // Exibir mensagem de sucesso
+                showAlert('Modalidade excluída com sucesso!', 'success');
+                
+                // Recarregar dados
+                carregarModalidades(1);
+            })
+            .catch(error => {
+                // Fechar modal
+                bootstrap.Modal.getInstance(document.getElementById('modal-confirma-exclusao')).hide();
+                
+                // Exibir mensagem de erro
+                showAlert('Erro ao excluir modalidade: ' + error.message, 'danger');
+            });
+    }
+</script>

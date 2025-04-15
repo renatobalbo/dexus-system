@@ -1,0 +1,370 @@
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Consultores</h1>
+        <button id="btn-novo-consultor" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Novo Consultor
+        </button>
+    </div>
+
+    <!-- Cartão de Pesquisa -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="filtro-codigo">Código:</label>
+                        <input type="text" class="form-control" id="filtro-codigo">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="filtro-nome">Nome:</label>
+                        <input type="text" class="form-control" id="filtro-nome">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro-atuacao">Atuação:</label>
+                        <input type="text" class="form-control" id="filtro-atuacao">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" id="btn-filtrar" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <button type="button" id="btn-limpar-filtro" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartão de Resultados -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Consultores Cadastrados</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="tabela-consultores" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>E-mail</th>
+                            <th>Atuação</th>
+                            <th>Valor Hora</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="placeholder-row">
+                            <td colspan="7" class="text-center">Carregando dados...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <p id="info-paginacao">Exibindo 0 de 0 registros</p>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="Navegação de página">
+                        <ul class="pagination justify-content-end" id="paginacao">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Próximo</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modal-confirma-exclusao" tabindex="-1" aria-labelledby="modal-confirma-exclusao-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-confirma-exclusao-label">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja realmente excluir o consultor <strong id="nome-consultor-exclusao"></strong>?</p>
+                <p class="text-danger">Esta ação não poderá ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirma-exclusao">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para a listagem de consultores
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar eventos dos botões
+        document.getElementById('btn-novo-consultor').addEventListener('click', function() {
+            loadConsultorForm();
+        });
+        
+        document.getElementById('btn-filtrar').addEventListener('click', function() {
+            carregarConsultores(1);
+        });
+        
+        document.getElementById('btn-limpar-filtro').addEventListener('click', function() {
+            // Limpar campos de filtro
+            document.getElementById('filtro-codigo').value = '';
+            document.getElementById('filtro-nome').value = '';
+            document.getElementById('filtro-atuacao').value = '';
+            
+            // Recarregar dados
+            carregarConsultores(1);
+        });
+        
+        // Carregar dados iniciais
+        carregarConsultores(1);
+    });
+    
+    // Função para carregar a lista de consultores
+    function carregarConsultores(pagina = 1) {
+        // Obter parâmetros de filtro
+        const filtros = {
+            pagina: pagina,
+            codigo: document.getElementById('filtro-codigo').value,
+            nome: document.getElementById('filtro-nome').value,
+            atuacao: document.getElementById('filtro-atuacao').value
+        };
+        
+        // Exibir loader
+        document.querySelector('#tabela-consultores tbody').innerHTML = `
+            <tr class="placeholder-row">
+                <td colspan="7" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        // Buscar dados na API
+        fetchConsultores(filtros)
+            .then(data => {
+                // Limpar tabela
+                document.querySelector('#tabela-consultores tbody').innerHTML = '';
+                
+                // Verificar se há resultados
+                if (data.consultores && data.consultores.length > 0) {
+                    // Adicionar linhas à tabela
+                    data.consultores.forEach(consultor => {
+                        // Formatar valor hora
+                        let valorHora = '';
+                        if (consultor.CONVAL) {
+                            const valor = parseFloat(consultor.CONVAL);
+                            valorHora = valor.toLocaleString('pt-BR', {
+                                style: 'currency',
+                                currency: 'BRL',
+                                minimumFractionDigits: 2
+                            });
+                        }
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${consultor.CONCOD}</td>
+                            <td>${consultor.CONNOM}</td>
+                            <td>${consultor.CONTEL || ''}</td>
+                            <td>${consultor.CONEMA || ''}</td>
+                            <td>${consultor.CONATU || ''}</td>
+                            <td>${valorHora}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-info" onclick="visualizarConsultor(${consultor.CONCOD})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="editarConsultor(${consultor.CONCOD})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmarExclusaoConsultor(${consultor.CONCOD}, '${consultor.CONNOM}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        document.querySelector('#tabela-consultores tbody').appendChild(row);
+                    });
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 
+                        `Exibindo ${data.inicio} a ${data.fim} de ${data.total} registros`;
+                    
+                    // Atualizar controles de paginação
+                    atualizarPaginacao(data.paginaAtual, data.totalPaginas);
+                } else {
+                    // Exibir mensagem de nenhum resultado
+                    document.querySelector('#tabela-consultores tbody').innerHTML = `
+                        <tr>
+                            <td colspan="7" class="text-center">Nenhum consultor encontrado</td>
+                        </tr>
+                    `;
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 'Exibindo 0 de 0 registros';
+                    
+                    // Limpar paginação
+                    document.getElementById('paginacao').innerHTML = '';
+                }
+            })
+            .catch(error => {
+                // Exibir mensagem de erro
+                document.querySelector('#tabela-consultores tbody').innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center text-danger">Erro ao carregar dados: ${error.message}</td>
+                    </tr>
+                `;
+                
+                showAlert('Erro ao carregar consultores: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para atualizar os controles de paginação
+    function atualizarPaginacao(paginaAtual, totalPaginas) {
+        const paginacao = document.getElementById('paginacao');
+        paginacao.innerHTML = '';
+        
+        // Botão "Anterior"
+        const liAnterior = document.createElement('li');
+        liAnterior.className = `page-item ${paginaAtual === 1 ? 'disabled' : ''}`;
+        
+        const linkAnterior = document.createElement('a');
+        linkAnterior.className = 'page-link';
+        linkAnterior.href = '#';
+        linkAnterior.textContent = 'Anterior';
+        
+        if (paginaAtual > 1) {
+            linkAnterior.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarConsultores(paginaAtual - 1);
+            });
+        }
+        
+        liAnterior.appendChild(linkAnterior);
+        paginacao.appendChild(liAnterior);
+        
+        // Páginas numéricas
+        let inicio = Math.max(1, paginaAtual - 2);
+        let fim = Math.min(totalPaginas, inicio + 4);
+        
+        if (fim - inicio < 4 && inicio > 1) {
+            inicio = Math.max(1, fim - 4);
+        }
+        
+        for (let i = inicio; i <= fim; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === paginaAtual ? 'active' : ''}`;
+            
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.textContent = i;
+            
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarConsultores(i);
+            });
+            
+            li.appendChild(link);
+            paginacao.appendChild(li);
+        }
+        
+        // Botão "Próximo"
+        const liProximo = document.createElement('li');
+        liProximo.className = `page-item ${paginaAtual === totalPaginas ? 'disabled' : ''}`;
+        
+        const linkProximo = document.createElement('a');
+        linkProximo.className = 'page-link';
+        linkProximo.href = '#';
+        linkProximo.textContent = 'Próximo';
+        
+        if (paginaAtual < totalPaginas) {
+            linkProximo.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarConsultores(paginaAtual + 1);
+            });
+        }
+        
+        liProximo.appendChild(linkProximo);
+        paginacao.appendChild(liProximo);
+    }
+    
+    // Função para visualizar um consultor
+    function visualizarConsultor(id) {
+        loadConsultorForm(id, 'visualizar');
+    }
+    
+    // Função para editar um consultor
+    function editarConsultor(id) {
+        loadConsultorForm(id, 'editar');
+    }
+    
+    // Função para confirmar exclusão de consultor
+    function confirmarExclusaoConsultor(id, nome) {
+        // Preencher nome do consultor no modal
+        document.getElementById('nome-consultor-exclusao').textContent = nome;
+        
+        // Configurar botão de confirmação
+        document.getElementById('btn-confirma-exclusao').onclick = function() {
+            excluirConsultor(id);
+        };
+        
+        // Exibir modal
+        const modal = new bootstrap.Modal(document.getElementById('modal-confirma-exclusao'));
+        modal.show();
+    }
+    
+    // Função para excluir um consultor
+    function excluirConsultor(id) {
+        // Verificar se o consultor pode ser excluído
+        canDeleteConsultor(id)
+            .then(data => {
+                if (data.canDelete) {
+                    // Realizar exclusão
+                    return deleteConsultor(id);
+                } else {
+                    // Exibir mensagem de erro
+                    throw new Error(data.message || 'Este consultor não pode ser excluído porque está vinculado a uma ou mais ordens de serviço.');
+                }
+            })
+            .then(data => {
+                // Fechar modal
+                bootstrap.Modal.getInstance(document.getElementById('modal-confirma-exclusao')).hide();
+                
+                // Exibir mensagem de sucesso
+                showAlert('Consultor excluído com sucesso!', 'success');
+                
+                // Recarregar dados
+                carregarConsultores(1);
+            })
+            .catch(error => {
+                // Fechar modal
+                bootstrap.Modal.getInstance(document.getElementById('modal-confirma-exclusao')).hide();
+                
+                // Exibir mensagem de erro
+                showAlert('Erro ao excluir consultor: ' + error.message, 'danger');
+            });
+    }
+</script>

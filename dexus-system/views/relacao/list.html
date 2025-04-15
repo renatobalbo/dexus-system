@@ -1,0 +1,753 @@
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Relação de Ordens de Serviço</h1>
+    </div>
+
+    <!-- Cartão de Pesquisa -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="filtro-numero">Número:</label>
+                        <input type="text" class="form-control" id="filtro-numero">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-data-inicial">Data Inicial:</label>
+                        <input type="text" class="form-control date-mask" id="filtro-data-inicial" placeholder="DD/MM/YYYY">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-data-final">Data Final:</label>
+                        <input type="text" class="form-control date-mask" id="filtro-data-final" placeholder="DD/MM/YYYY">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro-cliente">Cliente:</label>
+                        <select class="form-control" id="filtro-cliente">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-faturado">Faturado:</label>
+                        <select class="form-control" id="filtro-faturado">
+                            <option value="">Todos</option>
+                            <option value="S">S - Sim</option>
+                            <option value="N">N - Não</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-cobrado">Cobrado:</label>
+                        <select class="form-control" id="filtro-cobrado">
+                            <option value="">Todos</option>
+                            <option value="S">S - Sim</option>
+                            <option value="N">N - Não</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" id="btn-filtrar" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <button type="button" id="btn-limpar-filtro" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartão de Resultados -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Relação de Ordens de Serviço</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Ações em Lote:</div>
+                    <a class="dropdown-item" href="#" id="btn-marcar-faturados">Marcar Selecionados como Faturados</a>
+                    <a class="dropdown-item" href="#" id="btn-marcar-cobrados">Marcar Selecionados como Cobrados</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" id="btn-exportar-excel">Exportar para Excel</a>
+                    <a class="dropdown-item" href="#" id="btn-gerar-pdf">Gerar Relatório PDF</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="tabela-relacao" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selecionar-todos">
+                                </div>
+                            </th>
+                            <th>Número</th>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Tempo Total</th>
+                            <th>Faturado</th>
+                            <th>Cobrado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="placeholder-row">
+                            <td colspan="8" class="text-center">Carregando dados...</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-end">Total:</th>
+                            <th id="tempo-total-soma">00:00</th>
+                            <th colspan="3"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <p id="info-paginacao">Exibindo 0 de 0 registros</p>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="Navegação de página">
+                        <ul class="pagination justify-content-end" id="paginacao">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Próximo</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row">
+        <div class="col-xl-6 col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Estatísticas por Cliente</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie">
+                        <canvas id="clientesChart" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6 col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Faturamento x Cobrança</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Quantidade</th>
+                                    <th>Tempo Total</th>
+                                    <th>%</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Faturados</td>
+                                    <td id="qtd-faturados">0</td>
+                                    <td id="tempo-faturados">00:00</td>
+                                    <td id="perc-faturados">0%</td>
+                                </tr>
+                                <tr>
+                                    <td>Não Faturados</td>
+                                    <td id="qtd-nao-faturados">0</td>
+                                    <td id="tempo-nao-faturados">00:00</td>
+                                    <td id="perc-nao-faturados">0%</td>
+                                </tr>
+                                <tr>
+                                    <td>Cobrados</td>
+                                    <td id="qtd-cobrados">0</td>
+                                    <td id="tempo-cobrados">00:00</td>
+                                    <td id="perc-cobrados">0%</td>
+                                </tr>
+                                <tr>
+                                    <td>Não Cobrados</td>
+                                    <td id="qtd-nao-cobrados">0</td>
+                                    <td id="tempo-nao-cobrados">00:00</td>
+                                    <td id="perc-nao-cobrados">0%</td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <td><strong>Total</strong></td>
+                                    <td id="qtd-total">0</td>
+                                    <td id="tempo-total">00:00</td>
+                                    <td>100%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para a relação de OS
+    document.addEventListener('DOMContentLoaded', function() {
+        // Carregar selects para os filtros
+        loadClientesSelect('filtro-cliente');
+        
+        // Configurar eventos dos botões
+        document.getElementById('btn-filtrar').addEventListener('click', function() {
+            carregarRelacaoOS(1);
+        });
+        
+        document.getElementById('btn-limpar-filtro').addEventListener('click', function() {
+            // Limpar todos os campos de filtro
+            document.getElementById('filtro-numero').value = '';
+            document.getElementById('filtro-data-inicial').value = '';
+            document.getElementById('filtro-data-final').value = '';
+            document.getElementById('filtro-cliente').value = '';
+            document.getElementById('filtro-faturado').value = '';
+            document.getElementById('filtro-cobrado').value = '';
+            
+            // Recarregar dados
+            carregarRelacaoOS(1);
+        });
+        
+        // Configurar botão "Selecionar todos"
+        document.getElementById('selecionar-todos').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('input[name="selecionar-os"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        // Configurar ações em lote
+        document.getElementById('btn-marcar-faturados').addEventListener('click', function(e) {
+            e.preventDefault();
+            marcarSelecionadosComoFaturados();
+        });
+        
+        document.getElementById('btn-marcar-cobrados').addEventListener('click', function(e) {
+            e.preventDefault();
+            marcarSelecionadosComoCobrados();
+        });
+        
+        document.getElementById('btn-exportar-excel').addEventListener('click', function(e) {
+            e.preventDefault();
+            exportarParaExcel();
+        });
+        
+        document.getElementById('btn-gerar-pdf').addEventListener('click', function(e) {
+            e.preventDefault();
+            gerarRelatorioPDF();
+        });
+        
+        // Carregar dados iniciais
+        carregarRelacaoOS(1);
+    });
+    
+    // Função para carregar a relação de OS
+    function carregarRelacaoOS(pagina = 1) {
+        // Obter parâmetros de filtro
+        const filtros = {
+            pagina: pagina,
+            numero: document.getElementById('filtro-numero').value,
+            dataInicial: document.getElementById('filtro-data-inicial').value,
+            dataFinal: document.getElementById('filtro-data-final').value,
+            cliente: document.getElementById('filtro-cliente').value,
+            faturado: document.getElementById('filtro-faturado').value,
+            cobrado: document.getElementById('filtro-cobrado').value
+        };
+        
+        // Exibir loader
+        document.querySelector('#tabela-relacao tbody').innerHTML = `
+            <tr class="placeholder-row">
+                <td colspan="8" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        // Buscar dados na API
+        fetchRelacaoOS(filtros)
+            .then(data => {
+                // Limpar tabela
+                document.querySelector('#tabela-relacao tbody').innerHTML = '';
+                
+                // Verificar se há resultados
+                if (data.relacao && data.relacao.length > 0) {
+                    // Adicionar linhas à tabela
+                    data.relacao.forEach(os => {
+                        // Formatar data
+                        const data = formatarData(os.RELOSDATA);
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="selecionar-os" value="${os.RELOSNUM}">
+                                </div>
+                            </td>
+                            <td>${os.RELOSNUM}</td>
+                            <td>${data}</td>
+                            <td>${os.CLIRAZ || ''}</td>
+                            <td>${os.RELOSHTOT || ''}</td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="faturado-${os.RELOSNUM}" ${os.RELOSFAT === 'S' ? 'checked' : ''} onchange="atualizarStatusFaturamento(${os.RELOSNUM}, this.checked)">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="cobrado-${os.RELOSNUM}" ${os.RELOSCOB === 'S' ? 'checked' : ''} onchange="atualizarStatusCobranca(${os.RELOSNUM}, this.checked)">
+                                </div>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="visualizarOS(${os.RELOSNUM})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-success" onclick="imprimirOS(${os.RELOSNUM})">
+                                    <i class="fas fa-print"></i>
+                                </button>
+                            </td>
+                        `;
+                        document.querySelector('#tabela-relacao tbody').appendChild(row);
+                    });
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 
+                        `Exibindo ${data.inicio} a ${data.fim} de ${data.total} registros`;
+                    
+                    // Atualizar controles de paginação
+                    atualizarPaginacao(data.paginaAtual, data.totalPaginas);
+                    
+                    // Atualizar estatísticas
+                    atualizarEstatisticas(data.estatisticas);
+                } else {
+                    // Exibir mensagem de nenhum resultado
+                    document.querySelector('#tabela-relacao tbody').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center">Nenhuma ordem de serviço encontrada</td>
+                        </tr>
+                    `;
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 'Exibindo 0 de 0 registros';
+                    
+                    // Limpar paginação
+                    document.getElementById('paginacao').innerHTML = '';
+                    
+                    // Limpar estatísticas
+                    limparEstatisticas();
+                }
+            })
+            .catch(error => {
+                // Exibir mensagem de erro
+                document.querySelector('#tabela-relacao tbody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger">Erro ao carregar dados: ${error.message}</td>
+                    </tr>
+                `;
+                
+                showAlert('Erro ao carregar relação de ordens de serviço: ' + error.message, 'danger');
+                
+                // Limpar estatísticas
+                limparEstatisticas();
+            });
+    }
+    
+    // Função para atualizar os controles de paginação
+    function atualizarPaginacao(paginaAtual, totalPaginas) {
+        const paginacao = document.getElementById('paginacao');
+        paginacao.innerHTML = '';
+        
+        // Botão "Anterior"
+        const liAnterior = document.createElement('li');
+        liAnterior.className = `page-item ${paginaAtual === 1 ? 'disabled' : ''}`;
+        
+        const linkAnterior = document.createElement('a');
+        linkAnterior.className = 'page-link';
+        linkAnterior.href = '#';
+        linkAnterior.textContent = 'Anterior';
+        
+        if (paginaAtual > 1) {
+            linkAnterior.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarRelacaoOS(paginaAtual - 1);
+            });
+        }
+        
+        liAnterior.appendChild(linkAnterior);
+        paginacao.appendChild(liAnterior);
+        
+        // Páginas numéricas
+        let inicio = Math.max(1, paginaAtual - 2);
+        let fim = Math.min(totalPaginas, inicio + 4);
+        
+        if (fim - inicio < 4 && inicio > 1) {
+            inicio = Math.max(1, fim - 4);
+        }
+        
+        for (let i = inicio; i <= fim; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === paginaAtual ? 'active' : ''}`;
+            
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.textContent = i;
+            
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarRelacaoOS(i);
+            });
+            
+            li.appendChild(link);
+            paginacao.appendChild(li);
+        }
+        
+        // Botão "Próximo"
+        const liProximo = document.createElement('li');
+        liProximo.className = `page-item ${paginaAtual === totalPaginas ? 'disabled' : ''}`;
+        
+        const linkProximo = document.createElement('a');
+        linkProximo.className = 'page-link';
+        linkProximo.href = '#';
+        linkProximo.textContent = 'Próximo';
+        
+        if (paginaAtual < totalPaginas) {
+            linkProximo.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarRelacaoOS(paginaAtual + 1);
+            });
+        }
+        
+        liProximo.appendChild(linkProximo);
+        paginacao.appendChild(liProximo);
+    }
+    
+    // Função para formatar data (YYYY-MM-DD para DD/MM/YYYY)
+    function formatarData(data) {
+        if (!data) return '';
+        
+        // Verificar se a data já está no formato DD/MM/YYYY
+        if (data.includes('/')) return data;
+        
+        const partes = data.split('-');
+        if (partes.length !== 3) return data;
+        
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    
+    // Função para atualizar o status de faturamento de uma OS
+    function atualizarStatusFaturamento(id, faturado) {
+        updateOSFaturamento(id, { faturado: faturado ? 'S' : 'N' })
+            .then(data => {
+                if (data.success) {
+                    showAlert('Status de faturamento atualizado com sucesso!', 'success');
+                    
+                    // Recarregar estatísticas
+                    carregarEstatisticas();
+                } else {
+                    showAlert(data.message || 'Erro ao atualizar status de faturamento.', 'warning');
+                    
+                    // Reverter estado do checkbox
+                    document.getElementById(`faturado-${id}`).checked = !faturado;
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao atualizar status: ' + error.message, 'danger');
+                
+                // Reverter estado do checkbox
+                document.getElementById(`faturado-${id}`).checked = !faturado;
+            });
+    }
+    
+    // Função para atualizar o status de cobrança de uma OS
+    function atualizarStatusCobranca(id, cobrado) {
+        updateOSCobranca(id, { cobrado: cobrado ? 'S' : 'N' })
+            .then(data => {
+                if (data.success) {
+                    showAlert('Status de cobrança atualizado com sucesso!', 'success');
+                    
+                    // Recarregar estatísticas
+                    carregarEstatisticas();
+                } else {
+                    showAlert(data.message || 'Erro ao atualizar status de cobrança.', 'warning');
+                    
+                    // Reverter estado do checkbox
+                    document.getElementById(`cobrado-${id}`).checked = !cobrado;
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao atualizar status: ' + error.message, 'danger');
+                
+                // Reverter estado do checkbox
+                document.getElementById(`cobrado-${id}`).checked = !cobrado;
+            });
+    }
+    
+    // Função para marcar as OS selecionadas como faturadas
+    function marcarSelecionadosComoFaturados() {
+        const checkboxes = document.querySelectorAll('input[name="selecionar-os"]:checked');
+        
+        if (checkboxes.length === 0) {
+            showAlert('Nenhuma OS selecionada.', 'warning');
+            return;
+        }
+        
+        // Confirmar ação
+        if (!confirm(`Deseja marcar ${checkboxes.length} OS como faturadas?`)) {
+            return;
+        }
+        
+        // Array de promessas para atualização em paralelo
+        const promessas = [];
+        
+        // Atualizar cada OS selecionada
+        checkboxes.forEach(checkbox => {
+            const id = checkbox.value;
+            promessas.push(updateOSFaturamento(id, { faturado: 'S' }));
+            
+            // Atualizar checkbox na interface
+            document.getElementById(`faturado-${id}`).checked = true;
+        });
+        
+        // Aguardar todas as atualizações
+        Promise.all(promessas)
+            .then(() => {
+                showAlert('OS marcadas como faturadas com sucesso!', 'success');
+                
+                // Recarregar estatísticas
+                carregarEstatisticas();
+            })
+            .catch(error => {
+                showAlert('Erro ao atualizar status: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para marcar as OS selecionadas como cobradas
+    function marcarSelecionadosComoCobrados() {
+        const checkboxes = document.querySelectorAll('input[name="selecionar-os"]:checked');
+        
+        if (checkboxes.length === 0) {
+            showAlert('Nenhuma OS selecionada.', 'warning');
+            return;
+        }
+        
+        // Confirmar ação
+        if (!confirm(`Deseja marcar ${checkboxes.length} OS como cobradas?`)) {
+            return;
+        }
+        
+        // Array de promessas para atualização em paralelo
+        const promessas = [];
+        
+        // Atualizar cada OS selecionada
+        checkboxes.forEach(checkbox => {
+            const id = checkbox.value;
+            promessas.push(updateOSCobranca(id, { cobrado: 'S' }));
+            
+            // Atualizar checkbox na interface
+            document.getElementById(`cobrado-${id}`).checked = true;
+        });
+        
+        // Aguardar todas as atualizações
+        Promise.all(promessas)
+            .then(() => {
+                showAlert('OS marcadas como cobradas com sucesso!', 'success');
+                
+                // Recarregar estatísticas
+                carregarEstatisticas();
+            })
+            .catch(error => {
+                showAlert('Erro ao atualizar status: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para exportar relação para Excel
+    function exportarParaExcel() {
+        // No ambiente real, aqui faria uma chamada à API para gerar o Excel
+        showAlert('Função de exportação para Excel será implementada na próxima fase do projeto.', 'info');
+    }
+    
+    // Função para gerar relatório em PDF
+    function gerarRelatorioPDF() {
+        // No ambiente real, aqui faria uma chamada à API para gerar o PDF
+        showAlert('Função de geração de relatório PDF será implementada na próxima fase do projeto.', 'info');
+    }
+    
+    // Função para atualizar estatísticas
+    function atualizarEstatisticas(estatisticas) {
+        if (!estatisticas) {
+            limparEstatisticas();
+            return;
+        }
+        
+        // Atualizar soma do tempo total
+        document.getElementById('tempo-total-soma').textContent = estatisticas.tempoTotal || '00:00';
+        
+        // Atualizar tabela de estatísticas
+        document.getElementById('qtd-faturados').textContent = estatisticas.qtdFaturados || 0;
+        document.getElementById('tempo-faturados').textContent = estatisticas.tempoFaturados || '00:00';
+        document.getElementById('perc-faturados').textContent = `${estatisticas.percFaturados || 0}%`;
+        
+        document.getElementById('qtd-nao-faturados').textContent = estatisticas.qtdNaoFaturados || 0;
+        document.getElementById('tempo-nao-faturados').textContent = estatisticas.tempoNaoFaturados || '00:00';
+        document.getElementById('perc-nao-faturados').textContent = `${estatisticas.percNaoFaturados || 0}%`;
+        
+        document.getElementById('qtd-cobrados').textContent = estatisticas.qtdCobrados || 0;
+        document.getElementById('tempo-cobrados').textContent = estatisticas.tempoCobrados || '00:00';
+        document.getElementById('perc-cobrados').textContent = `${estatisticas.percCobrados || 0}%`;
+        
+        document.getElementById('qtd-nao-cobrados').textContent = estatisticas.qtdNaoCobrados || 0;
+        document.getElementById('tempo-nao-cobrados').textContent = estatisticas.tempoNaoCobrados || '00:00';
+        document.getElementById('perc-nao-cobrados').textContent = `${estatisticas.percNaoCobrados || 0}%`;
+        
+        document.getElementById('qtd-total').textContent = estatisticas.qtdTotal || 0;
+        document.getElementById('tempo-total').textContent = estatisticas.tempoTotal || '00:00';
+        
+        // Atualizar gráfico de clientes
+        atualizarGraficoClientes(estatisticas.clientes);
+    }
+    
+    // Função para limpar estatísticas
+    function limparEstatisticas() {
+        document.getElementById('tempo-total-soma').textContent = '00:00';
+        
+        document.getElementById('qtd-faturados').textContent = '0';
+        document.getElementById('tempo-faturados').textContent = '00:00';
+        document.getElementById('perc-faturados').textContent = '0%';
+        
+        document.getElementById('qtd-nao-faturados').textContent = '0';
+        document.getElementById('tempo-nao-faturados').textContent = '00:00';
+        document.getElementById('perc-nao-faturados').textContent = '0%';
+        
+        document.getElementById('qtd-cobrados').textContent = '0';
+        document.getElementById('tempo-cobrados').textContent = '00:00';
+        document.getElementById('perc-cobrados').textContent = '0%';
+        
+        document.getElementById('qtd-nao-cobrados').textContent = '0';
+        document.getElementById('tempo-nao-cobrados').textContent = '00:00';
+        document.getElementById('perc-nao-cobrados').textContent = '0%';
+        
+        document.getElementById('qtd-total').textContent = '0';
+        document.getElementById('tempo-total').textContent = '00:00';
+        
+        // Limpar gráfico de clientes
+        if (window.clientesChart) {
+            window.clientesChart.data.labels = [];
+            window.clientesChart.data.datasets[0].data = [];
+            window.clientesChart.update();
+        }
+    }
+    
+    // Função para carregar estatísticas separadamente
+    function carregarEstatisticas() {
+        // Obter parâmetros de filtro atuais
+        const filtros = {
+            numero: document.getElementById('filtro-numero').value,
+            dataInicial: document.getElementById('filtro-data-inicial').value,
+            dataFinal: document.getElementById('filtro-data-final').value,
+            cliente: document.getElementById('filtro-cliente').value,
+            faturado: document.getElementById('filtro-faturado').value,
+            cobrado: document.getElementById('filtro-cobrado').value
+        };
+        
+        // Buscar estatísticas na API
+        apiGet('relacao/estatisticas', filtros)
+            .then(data => {
+                if (data.estatisticas) {
+                    atualizarEstatisticas(data.estatisticas);
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar estatísticas:', error);
+            });
+    }
+    
+    // Função para atualizar o gráfico de clientes
+    function atualizarGraficoClientes(dados) {
+        const ctx = document.getElementById('clientesChart');
+        
+        // Verificar se o gráfico já existe
+        if (window.clientesChart) {
+            // Atualizar dados do gráfico existente
+            window.clientesChart.data.labels = dados ? dados.map(item => item.nome) : [];
+            window.clientesChart.data.datasets[0].data = dados ? dados.map(item => item.tempo) : [];
+            window.clientesChart.update();
+        } else {
+            // Criar novo gráfico
+            window.clientesChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: dados ? dados.map(item => item.nome) : [],
+                    datasets: [{
+                        data: dados ? dados.map(item => item.tempo) : [],
+                        backgroundColor: [
+                            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                            '#5a5c69', '#6f42c1', '#fd7e14', '#20c9a6', '#858796'
+                        ],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    }
+    
+    // Função para visualizar uma OS
+    function visualizarOS(id) {
+        // Redirecionar para a tela de visualização de OS
+        loadOSContent();
+        setTimeout(() => {
+            visualizarOS(id);
+        }, 500);
+    }
+    
+    // Função para imprimir uma OS
+    function imprimirOS(id) {
+        generateOSPDF(id)
+            .then(pdfUrl => {
+                // Abrir PDF em nova janela
+                window.open(pdfUrl, '_blank');
+            })
+            .catch(error => {
+                showAlert('Erro ao gerar PDF: ' + error.message, 'danger');
+            });
+    }

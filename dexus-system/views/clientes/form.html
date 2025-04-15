@@ -1,0 +1,225 @@
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary" id="form-title">Novo Cliente</h6>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="form-cliente">
+                <div class="row">
+                    <!-- Campo código -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="CLICOD">Código:</label>
+                            <input type="text" class="form-control" id="CLICOD" name="CLICOD" readonly>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo tipo -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="CLITIP">Tipo:</label>
+                            <select class="form-control" id="CLITIP" name="CLITIP">
+                                <option value="">Selecione...</option>
+                                <option value="F">F - Pessoa Física</option>
+                                <option value="J">J - Pessoa Jurídica</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo CPF/CNPJ -->
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="CLIDOC">CPF/CNPJ:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control cpf-cnpj-mask" id="CLIDOC" name="CLIDOC" placeholder="000.000.000-00">
+                                <button class="btn btn-outline-secondary" type="button" id="btn-consultar-doc">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo Modalidade -->
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <label for="CLIMOD">Modalidade:</label>
+                            <div class="input-group">
+                                <select class="form-control" id="CLIMOD" name="CLIMOD">
+                                    <option value="">Selecione...</option>
+                                </select>
+                                <input type="text" class="form-control" id="MODDES" name="MODDES" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo Razão Social -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="CLIRAZ">Razão Social:</label>
+                            <input type="text" class="form-control" id="CLIRAZ" name="CLIRAZ" maxlength="40">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo Nome Fantasia -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="CLIFAN">Nome Fantasia:</label>
+                            <input type="text" class="form-control" id="CLIFAN" name="CLIFAN" maxlength="20">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo Município -->
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="CLIMUN">Município:</label>
+                            <input type="text" class="form-control" id="CLIMUN" name="CLIMUN" maxlength="40">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo UF -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="CLIEST">UF:</label>
+                            <select class="form-control" id="CLIEST" name="CLIEST">
+                                <option value="">Selecione...</option>
+                                <option value="AC">AC</option>
+                                <option value="AL">AL</option>
+                                <option value="AM">AM</option>
+                                <option value="AP">AP</option>
+                                <option value="BA">BA</option>
+                                <option value="CE">CE</option>
+                                <option value="DF">DF</option>
+                                <option value="ES">ES</option>
+                                <option value="GO">GO</option>
+                                <option value="MA">MA</option>
+                                <option value="MG">MG</option>
+                                <option value="MS">MS</option>
+                                <option value="MT">MT</option>
+                                <option value="PA">PA</option>
+                                <option value="PB">PB</option>
+                                <option value="PE">PE</option>
+                                <option value="PI">PI</option>
+                                <option value="PR">PR</option>
+                                <option value="RJ">RJ</option>
+                                <option value="RN">RN</option>
+                                <option value="RO">RO</option>
+                                <option value="RR">RR</option>
+                                <option value="RS">RS</option>
+                                <option value="SC">SC</option>
+                                <option value="SE">SE</option>
+                                <option value="SP">SP</option>
+                                <option value="TO">TO</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo Responsável -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="CLIRES">Responsável:</label>
+                            <input type="text" class="form-control" id="CLIRES" name="CLIRES" maxlength="20">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo Valor Hora -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="CLIVAL">Valor Hora:</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="text" class="form-control currency-mask" id="CLIVAL" name="CLIVAL">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo E-mail OS -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="CLIEOS">E-mail OS:</label>
+                            <input type="email" class="form-control" id="CLIEOS" name="CLIEOS" maxlength="100">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo E-mail NF -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="CLIENF">E-mail NF:</label>
+                            <input type="email" class="form-control" id="CLIENF" name="CLIENF" maxlength="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para o formulário de cliente
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar consulta de CPF/CNPJ
+        document.getElementById('btn-consultar-doc').addEventListener('click', function() {
+            const documento = document.getElementById('CLIDOC').value;
+            const tipo = document.getElementById('CLITIP').value;
+            
+            if (!documento || !tipo) {
+                showAlert('Informe o tipo de pessoa e o documento para consultar.', 'warning');
+                return;
+            }
+            
+            // Limpar caracteres não numéricos para a consulta
+            const docLimpo = documento.replace(/\D/g, '');
+            
+            // Exibir loader
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+            this.disabled = true;
+            
+            // Consultar documento
+            consultarDocumento(docLimpo, tipo)
+                .then(data => {
+                    if (data.success) {
+                        // Preencher campos com os dados retornados
+                        document.getElementById('CLIRAZ').value = data.razaoSocial || '';
+                        document.getElementById('CLIFAN').value = data.nomeFantasia || '';
+                        document.getElementById('CLIMUN').value = data.municipio || '';
+                        document.getElementById('CLIEST').value = data.uf || '';
+                        
+                        showAlert('Dados consultados com sucesso!', 'success');
+                    } else {
+                        showAlert(data.message || 'Documento não encontrado.', 'warning');
+                    }
+                })
+                .catch(error => {
+                    showAlert('Erro ao consultar documento: ' + error.message, 'danger');
+                })
+                .finally(() => {
+                    // Restaurar botão
+                    this.innerHTML = '<i class="fas fa-search"></i>';
+                    this.disabled = false;
+                });
+        });
+    });
+</script>

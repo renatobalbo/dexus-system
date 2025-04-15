@@ -1,0 +1,141 @@
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary" id="form-title">Novo Serviço</h6>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="form-servico">
+                <div class="row">
+                    <!-- Campo código -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="SERCOD">Código:</label>
+                            <input type="text" class="form-control" id="SERCOD" name="SERCOD" readonly>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo descrição -->
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="SERDES">Descrição:</label>
+                            <input type="text" class="form-control" id="SERDES" name="SERDES" maxlength="40">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para o formulário de serviço
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar validação
+        setupServicoValidation();
+        
+        // Configurar botão de voltar
+        document.getElementById('btn-voltar').addEventListener('click', function() {
+            loadServicosContent();
+        });
+        
+        // Configurar envio do formulário
+        document.getElementById('form-servico').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar formulário
+            if (!validateServicoForm()) {
+                return;
+            }
+            
+            // Obter dados do formulário
+            const servicoId = document.getElementById('SERCOD').value;
+            const servicoData = {
+                SERDES: document.getElementById('SERDES').value
+            };
+            
+            // Salvar serviço
+            if (servicoId) {
+                // Atualizar serviço existente
+                updateServico(servicoId, servicoData)
+                    .then(response => {
+                        if (response.success) {
+                            showAlert('Serviço atualizado com sucesso!', 'success');
+                            loadServicosContent();
+                        } else {
+                            showAlert('Erro ao atualizar serviço: ' + response.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        showAlert('Erro ao atualizar serviço: ' + error.message, 'danger');
+                    });
+            } else {
+                // Criar novo serviço
+                createServico(servicoData)
+                    .then(response => {
+                        if (response.success) {
+                            showAlert('Serviço cadastrado com sucesso!', 'success');
+                            loadServicosContent();
+                        } else {
+                            showAlert('Erro ao cadastrar serviço: ' + response.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        showAlert('Erro ao cadastrar serviço: ' + error.message, 'danger');
+                    });
+            }
+        });
+    });
+    
+    /**
+     * Carrega os dados de um serviço para edição
+     * @param {number} id ID do serviço
+     */
+    function loadServicoData(id) {
+        // Atualizar título do formulário
+        document.getElementById('form-title').textContent = 'Editar Serviço';
+        
+        // Exibir loader
+        const btnSalvar = document.querySelector('button[type="submit"]');
+        const btnOriginalText = btnSalvar.innerHTML;
+        btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Carregando...';
+        btnSalvar.disabled = true;
+        
+        // Carregar dados do serviço
+        fetchServico(id)
+            .then(response => {
+                if (response.success) {
+                    const servico = response.servico;
+                    
+                    // Preencher formulário
+                    document.getElementById('SERCOD').value = servico.SERCOD;
+                    document.getElementById('SERDES').value = servico.SERDES;
+                } else {
+                    showAlert('Erro ao carregar dados do serviço: ' + response.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao carregar dados do serviço: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                // Restaurar botão
+                btnSalvar.innerHTML = btnOriginalText;
+                btnSalvar.disabled = false;
+            });
+    }
+</script>

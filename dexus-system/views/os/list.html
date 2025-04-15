@@ -1,0 +1,610 @@
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Ordens de Serviço</h1>
+        <button id="btn-nova-os" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Nova OS
+        </button>
+    </div>
+
+    <!-- Cartão de Pesquisa -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label for="filtro-numero">Número:</label>
+                        <input type="text" class="form-control" id="filtro-numero">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-data-inicial">Data Inicial:</label>
+                        <input type="text" class="form-control date-mask" id="filtro-data-inicial" placeholder="DD/MM/YYYY">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-data-final">Data Final:</label>
+                        <input type="text" class="form-control date-mask" id="filtro-data-final" placeholder="DD/MM/YYYY">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro-cliente">Cliente:</label>
+                        <select class="form-control" id="filtro-cliente">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro-modalidade">Modalidade:</label>
+                        <select class="form-control" id="filtro-modalidade">
+                            <option value="">Todas</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro-servico">Serviço:</label>
+                        <select class="form-control" id="filtro-servico">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="filtro-consultor">Consultor:</label>
+                        <select class="form-control" id="filtro-consultor">
+                            <option value="">Todos</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label for="filtro-enviada">OS Enviada:</label>
+                        <select class="form-control" id="filtro-enviada">
+                            <option value="">Todas</option>
+                            <option value="S">S - Sim</option>
+                            <option value="N">N - Não</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button type="button" id="btn-filtrar" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Filtrar
+                    </button>
+                    <button type="button" id="btn-limpar-filtro" class="btn btn-secondary">
+                        <i class="fas fa-eraser"></i> Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartão de Resultados -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Ordens de Serviço Cadastradas</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="tabela-os" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Serviço</th>
+                            <th>Consultor</th>
+                            <th>Tempo Total</th>
+                            <th>Enviada</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="placeholder-row">
+                            <td colspan="8" class="text-center">Carregando dados...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Paginação -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <p id="info-paginacao">Exibindo 0 de 0 registros</p>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="Navegação de página">
+                        <ul class="pagination justify-content-end" id="paginacao">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Próximo</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modal-confirma-exclusao" tabindex="-1" aria-labelledby="modal-confirma-exclusao-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-confirma-exclusao-label">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja realmente excluir a Ordem de Serviço <strong id="numero-os-exclusao"></strong>?</p>
+                <p class="text-danger">Esta ação não poderá ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirma-exclusao">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Visualização de OS -->
+<div class="modal fade" id="modal-visualiza-os" tabindex="-1" aria-labelledby="modal-visualiza-os-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-visualiza-os-label">Visualizar Ordem de Serviço</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body" id="modal-visualiza-os-body">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="btn-imprimir-os">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para a listagem de OS
+    document.addEventListener('DOMContentLoaded', function() {
+        // Carregar selects para os filtros
+        loadClientesSelect('filtro-cliente');
+        loadServicosSelect('filtro-servico');
+        loadConsultoresSelect('filtro-consultor');
+        loadModalidadesSelect('filtro-modalidade');
+        
+        // Configurar eventos dos botões
+        document.getElementById('btn-filtrar').addEventListener('click', function() {
+            carregarOS(1);
+        });
+        
+        document.getElementById('btn-limpar-filtro').addEventListener('click', function() {
+            // Limpar todos os campos de filtro
+            document.getElementById('filtro-numero').value = '';
+            document.getElementById('filtro-data-inicial').value = '';
+            document.getElementById('filtro-data-final').value = '';
+            document.getElementById('filtro-cliente').value = '';
+            document.getElementById('filtro-modalidade').value = '';
+            document.getElementById('filtro-servico').value = '';
+            document.getElementById('filtro-consultor').value = '';
+            document.getElementById('filtro-enviada').value = '';
+            
+            // Recarregar dados
+            carregarOS(1);
+        });
+        
+        // Carregar dados iniciais
+        carregarOS(1);
+    });
+    
+    // Função para carregar a lista de OS
+    function carregarOS(pagina = 1) {
+        // Obter parâmetros de filtro
+        const filtros = {
+            pagina: pagina,
+            numero: document.getElementById('filtro-numero').value,
+            dataInicial: document.getElementById('filtro-data-inicial').value,
+            dataFinal: document.getElementById('filtro-data-final').value,
+            cliente: document.getElementById('filtro-cliente').value,
+            modalidade: document.getElementById('filtro-modalidade').value,
+            servico: document.getElementById('filtro-servico').value,
+            consultor: document.getElementById('filtro-consultor').value,
+            enviada: document.getElementById('filtro-enviada').value
+        };
+        
+        // Exibir loader
+        document.querySelector('#tabela-os tbody').innerHTML = `
+            <tr class="placeholder-row">
+                <td colspan="8" class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+        
+        // Buscar dados na API
+        fetchOrdens(filtros)
+            .then(data => {
+                // Limpar tabela
+                document.querySelector('#tabela-os tbody').innerHTML = '';
+                
+                // Verificar se há resultados
+                if (data.ordens && data.ordens.length > 0) {
+                    // Adicionar linhas à tabela
+                    data.ordens.forEach(os => {
+                        // Formatar data
+                        const data = formatarData(os.OSDATA);
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${os.OSNUM}</td>
+                            <td>${data}</td>
+                            <td>${os.CLIRAZ || ''}</td>
+                            <td>${os.SERDES || ''}</td>
+                            <td>${os.CONNOM || ''}</td>
+                            <td>${os.OSHTOT || ''}</td>
+                            <td>${os.OSENV === 'S' ? 'Sim' : 'Não'}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-info" onclick="visualizarOS(${os.OSNUM})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="editarOS(${os.OSNUM})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-success" onclick="imprimirOS(${os.OSNUM})">
+                                        <i class="fas fa-print"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-warning" onclick="enviarOS(${os.OSNUM})">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmarExclusaoOS(${os.OSNUM})">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        document.querySelector('#tabela-os tbody').appendChild(row);
+                    });
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 
+                        `Exibindo ${data.inicio} a ${data.fim} de ${data.total} registros`;
+                    
+                    // Atualizar controles de paginação
+                    atualizarPaginacao(data.paginaAtual, data.totalPaginas);
+                } else {
+                    // Exibir mensagem de nenhum resultado
+                    document.querySelector('#tabela-os tbody').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-center">Nenhuma ordem de serviço encontrada</td>
+                        </tr>
+                    `;
+                    
+                    // Atualizar informação de paginação
+                    document.getElementById('info-paginacao').textContent = 'Exibindo 0 de 0 registros';
+                    
+                    // Limpar paginação
+                    document.getElementById('paginacao').innerHTML = '';
+                }
+            })
+            .catch(error => {
+                // Exibir mensagem de erro
+                document.querySelector('#tabela-os tbody').innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger">Erro ao carregar dados: ${error.message}</td>
+                    </tr>
+                `;
+                
+                showAlert('Erro ao carregar ordens de serviço: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para atualizar os controles de paginação
+    function atualizarPaginacao(paginaAtual, totalPaginas) {
+        const paginacao = document.getElementById('paginacao');
+        paginacao.innerHTML = '';
+        
+        // Botão "Anterior"
+        const liAnterior = document.createElement('li');
+        liAnterior.className = `page-item ${paginaAtual === 1 ? 'disabled' : ''}`;
+        
+        const linkAnterior = document.createElement('a');
+        linkAnterior.className = 'page-link';
+        linkAnterior.href = '#';
+        linkAnterior.textContent = 'Anterior';
+        
+        if (paginaAtual > 1) {
+            linkAnterior.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarOS(paginaAtual - 1);
+            });
+        }
+        
+        liAnterior.appendChild(linkAnterior);
+        paginacao.appendChild(liAnterior);
+        
+        // Páginas numéricas
+        let inicio = Math.max(1, paginaAtual - 2);
+        let fim = Math.min(totalPaginas, inicio + 4);
+        
+        if (fim - inicio < 4 && inicio > 1) {
+            inicio = Math.max(1, fim - 4);
+        }
+        
+        for (let i = inicio; i <= fim; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === paginaAtual ? 'active' : ''}`;
+            
+            const link = document.createElement('a');
+            link.className = 'page-link';
+            link.href = '#';
+            link.textContent = i;
+            
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarOS(i);
+            });
+            
+            li.appendChild(link);
+            paginacao.appendChild(li);
+        }
+        
+        // Botão "Próximo"
+        const liProximo = document.createElement('li');
+        liProximo.className = `page-item ${paginaAtual === totalPaginas ? 'disabled' : ''}`;
+        
+        const linkProximo = document.createElement('a');
+        linkProximo.className = 'page-link';
+        linkProximo.href = '#';
+        linkProximo.textContent = 'Próximo';
+        
+        if (paginaAtual < totalPaginas) {
+            linkProximo.addEventListener('click', function(e) {
+                e.preventDefault();
+                carregarOS(paginaAtual + 1);
+            });
+        }
+        
+        liProximo.appendChild(linkProximo);
+        paginacao.appendChild(liProximo);
+    }
+    
+    // Função para formatar data (YYYY-MM-DD para DD/MM/YYYY)
+    function formatarData(data) {
+        if (!data) return '';
+        
+        // Verificar se a data já está no formato DD/MM/YYYY
+        if (data.includes('/')) return data;
+        
+        const partes = data.split('-');
+        if (partes.length !== 3) return data;
+        
+        return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    
+    // Função para visualizar uma OS
+    function visualizarOS(id) {
+        // Exibir modal de visualização
+        const modal = new bootstrap.Modal(document.getElementById('modal-visualiza-os'));
+        modal.show();
+        
+        // Exibir loader
+        document.getElementById('modal-visualiza-os-body').innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Carregando...</span>
+                </div>
+            </div>
+        `;
+        
+        // Configurar botão de impressão
+        document.getElementById('btn-imprimir-os').onclick = function() {
+            imprimirOS(id);
+        };
+        
+        // Buscar dados da OS
+        fetchOrdem(id)
+            .then(os => {
+                // Formatar data
+                const data = formatarData(os.OSDATA);
+                
+                // Preencher modal com os dados
+                document.getElementById('modal-visualiza-os-body').innerHTML = `
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Número:</strong> ${os.OSNUM}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Data:</strong> ${data}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Status:</strong> ${os.OSENV === 'S' ? 'Enviada' : 'Não Enviada'}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <strong>Cliente:</strong> ${os.CLIRAZ || ''}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Modalidade:</strong> ${os.MODDES || ''}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Responsável:</strong> ${os.OSCLIRES || ''}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Serviço:</strong> ${os.SERDES || ''}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Consultor:</strong> ${os.CONNOM || ''}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Hora Início:</strong> ${os.OSHINI || ''}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Hora Fim:</strong> ${os.OSHFIM || ''}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Descontos:</strong> ${os.OSHDES || ''}
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Traslado:</strong> ${os.OSHTRA || ''}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <strong>Tempo Total:</strong> ${os.OSHTOT || ''}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <strong>Detalhamento:</strong>
+                            <div class="border p-2 mt-1 bg-light">
+                                ${os.OSDET ? os.OSDET.replace(/\n/g, '<br>') : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('modal-visualiza-os-body').innerHTML = `
+                    <div class="alert alert-danger">
+                        Erro ao carregar dados da OS: ${error.message}
+                    </div>
+                `;
+            });
+    }
+    
+    // Função para editar uma OS
+    function editarOS(id) {
+        // Verificar se a OS pode ser modificada
+        canModifyOrdem(id)
+            .then(data => {
+                if (data.canModify) {
+                    // Carregar formulário de edição
+                    loadOSForm(id);
+                } else {
+                    showAlert('Esta Ordem de Serviço já foi enviada e não pode ser alterada.', 'warning');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao verificar status da OS: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para imprimir uma OS
+    function imprimirOS(id) {
+        generateOSPDF(id)
+            .then(pdfUrl => {
+                // Abrir PDF em nova janela
+                window.open(pdfUrl, '_blank');
+            })
+            .catch(error => {
+                showAlert('Erro ao gerar PDF: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para enviar uma OS por e-mail
+    function enviarOS(id) {
+        // Confirmar envio
+        if (!confirm('Deseja enviar esta Ordem de Serviço por e-mail?')) {
+            return;
+        }
+        
+        // Enviar e-mail
+        sendOSEmail(id)
+            .then(data => {
+                if (data.success) {
+                    showAlert('Ordem de Serviço enviada com sucesso!', 'success');
+                    
+                    // Recarregar dados
+                    carregarOS(1);
+                } else {
+                    showAlert(data.message || 'Erro ao enviar e-mail.', 'warning');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao enviar e-mail: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para confirmar exclusão de OS
+    function confirmarExclusaoOS(id) {
+        // Verificar se a OS pode ser excluída
+        canModifyOrdem(id)
+            .then(data => {
+                if (data.canModify) {
+                    // Preencher número da OS no modal
+                    document.getElementById('numero-os-exclusao').textContent = id;
+                    
+                    // Configurar botão de confirmação
+                    document.getElementById('btn-confirma-exclusao').onclick = function() {
+                        excluirOS(id);
+                    };
+                    
+                    // Exibir modal
+                    const modal = new bootstrap.Modal(document.getElementById('modal-confirma-exclusao'));
+                    modal.show();
+                } else {
+                    showAlert('Esta Ordem de Serviço já foi enviada e não pode ser excluída.', 'warning');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao verificar status da OS: ' + error.message, 'danger');
+            });
+    }
+    
+    // Função para excluir uma OS
+    function excluirOS(id) {
+        // Realizar exclusão
+        deleteOrdem(id)
+            .then(data => {
+                // Fechar modal
+                bootstrap.Modal.getInstance(document.getElementById('modal-confirma-exclusao')).hide();
+                
+                // Exibir mensagem de sucesso
+                showAlert('Ordem de Serviço excluída com sucesso!', 'success');
+                
+                // Recarregar dados
+                carregarOS(1);
+            })
+            .catch(error => {
+                // Fechar modal
+                bootstrap.Modal.getInstance(document.getElementById('modal-confirma-exclusao')).hide();
+                
+                // Exibir mensagem de erro
+                showAlert('Erro ao excluir OS: ' + error.message, 'danger');
+            });
+    }

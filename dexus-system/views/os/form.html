@@ -1,0 +1,331 @@
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary" id="form-title">Nova Ordem de Serviço</h6>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="form-os">
+                <div class="row">
+                    <!-- Campo número OS -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="OSNUM">Número:</label>
+                            <input type="text" class="form-control" id="OSNUM" name="OSNUM" readonly>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo data -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="OSDATA">Data:</label>
+                            <input type="text" class="form-control date-mask" id="OSDATA" name="OSDATA" placeholder="DD/MM/YYYY">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo cliente -->
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="OSCLICOD">Cliente:</label>
+                            <select class="form-control" id="OSCLICOD" name="OSCLICOD">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo modalidade -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="OSMODCOD">Modalidade:</label>
+                            <select class="form-control" id="OSMODCOD" name="OSMODCOD">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo responsável -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="OSCLIRES">Responsável:</label>
+                            <input type="text" class="form-control" id="OSCLIRES" name="OSCLIRES" maxlength="20">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo OS Enviada -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="OSENV">OS Enviada:</label>
+                            <select class="form-control" id="OSENV" name="OSENV">
+                                <option value="N">N - Não</option>
+                                <option value="S">S - Sim</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tempos -->
+                <div class="card mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Registro de Tempos</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Campo hora início -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="OSHINI">Hora Início:</label>
+                                    <input type="text" class="form-control time-mask" id="OSHINI" name="OSHINI" placeholder="HH:MM">
+                                </div>
+                            </div>
+                            
+                            <!-- Campo hora fim -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="OSHFIM">Hora Fim:</label>
+                                    <input type="text" class="form-control time-mask" id="OSHFIM" name="OSHFIM" placeholder="HH:MM">
+                                </div>
+                            </div>
+                            
+                            <!-- Campo descontos -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="OSHDES">Descontos:</label>
+                                    <input type="text" class="form-control time-mask" id="OSHDES" name="OSHDES" placeholder="HH:MM">
+                                </div>
+                            </div>
+                            
+                            <!-- Campo traslado -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="OSHTRA">Traslado:</label>
+                                    <input type="text" class="form-control time-mask" id="OSHTRA" name="OSHTRA" placeholder="HH:MM">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <!-- Campo tempo total -->
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="OSHTOT">Tempo Total:</label>
+                                    <input type="text" class="form-control time-mask" id="OSHTOT" name="OSHTOT" placeholder="HH:MM" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo serviço -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="OSSERCOD">Serviço:</label>
+                            <select class="form-control" id="OSSERCOD" name="OSSERCOD">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo consultor -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="OSCONCOD">Consultor:</label>
+                            <select class="form-control" id="OSCONCOD" name="OSCONCOD">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo detalhamento -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label for="OSDET">Detalhamento:</label>
+                            <textarea class="form-control" id="OSDET" name="OSDET" rows="6"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para o formulário de OS
+    document.addEventListener('DOMContentLoaded', function() {
+        // Carregar selects
+        loadClientesSelect();
+        loadServicosSelect();
+        loadConsultoresSelect();
+        loadModalidadesSelect();
+        
+        // Configurar data atual
+        const hoje = new Date();
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const ano = hoje.getFullYear();
+        document.getElementById('OSDATA').value = `${dia}/${mes}/${ano}`;
+        
+        // Configurar evento de seleção de cliente
+        document.getElementById('OSCLICOD').addEventListener('change', function() {
+            const clienteId = this.value;
+            if (clienteId) {
+                // Buscar dados do cliente
+                fetchCliente(clienteId)
+                    .then(cliente => {
+                        // Preencher campos relacionados ao cliente
+                        document.getElementById('OSCLIRES').value = cliente.CLIRES || '';
+                        
+                        // Preencher modalidade se disponível
+                        if (cliente.CLIMOD) {
+                            document.getElementById('OSMODCOD').value = cliente.CLIMOD;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar dados do cliente:', error);
+                    });
+            } else {
+                // Limpar campos relacionados
+                document.getElementById('OSCLIRES').value = '';
+            }
+        });
+    });
+    
+    // Função para carregar o select de clientes
+    function loadClientesSelect() {
+        const select = document.getElementById('OSCLICOD');
+        if (!select) return;
+        
+        // Exibir opção de carregamento
+        select.innerHTML = '<option value="">Carregando...</option>';
+        
+        // Buscar clientes na API
+        fetchClientes()
+            .then(data => {
+                // Limpar select
+                select.innerHTML = '<option value="">Selecione...</option>';
+                
+                // Adicionar opções
+                if (data.clientes && data.clientes.length > 0) {
+                    data.clientes.forEach(cliente => {
+                        const option = document.createElement('option');
+                        option.value = cliente.CLICOD;
+                        option.textContent = `${cliente.CLICOD} - ${cliente.CLIRAZ}`;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar clientes:', error);
+                select.innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+    }
+    
+    // Função para carregar o select de serviços
+    function loadServicosSelect() {
+        const select = document.getElementById('OSSERCOD');
+        if (!select) return;
+        
+        // Exibir opção de carregamento
+        select.innerHTML = '<option value="">Carregando...</option>';
+        
+        // Buscar serviços na API
+        fetchServicos()
+            .then(data => {
+                // Limpar select
+                select.innerHTML = '<option value="">Selecione...</option>';
+                
+                // Adicionar opções
+                if (data.servicos && data.servicos.length > 0) {
+                    data.servicos.forEach(servico => {
+                        const option = document.createElement('option');
+                        option.value = servico.SERCOD;
+                        option.textContent = `${servico.SERCOD} - ${servico.SERDES}`;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar serviços:', error);
+                select.innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+    }
+    
+    // Função para carregar o select de consultores
+    function loadConsultoresSelect() {
+        const select = document.getElementById('OSCONCOD');
+        if (!select) return;
+        
+        // Exibir opção de carregamento
+        select.innerHTML = '<option value="">Carregando...</option>';
+        
+        // Buscar consultores na API
+        fetchConsultores()
+            .then(data => {
+                // Limpar select
+                select.innerHTML = '<option value="">Selecione...</option>';
+                
+                // Adicionar opções
+                if (data.consultores && data.consultores.length > 0) {
+                    data.consultores.forEach(consultor => {
+                        const option = document.createElement('option');
+                        option.value = consultor.CONCOD;
+                        option.textContent = `${consultor.CONCOD} - ${consultor.CONNOM}`;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar consultores:', error);
+                select.innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+    }
+    
+    // Função para carregar o select de modalidades
+    function loadModalidadesSelect() {
+        const select = document.getElementById('OSMODCOD');
+        if (!select) return;
+        
+        // Exibir opção de carregamento
+        select.innerHTML = '<option value="">Carregando...</option>';
+        
+        // Buscar modalidades na API
+        fetchModalidades()
+            .then(data => {
+                // Limpar select
+                select.innerHTML = '<option value="">Selecione...</option>';
+                
+                // Adicionar opções
+                if (data.modalidades && data.modalidades.length > 0) {
+                    data.modalidades.forEach(modalidade => {
+                        const option = document.createElement('option');
+                        option.value = modalidade.MODCOD;
+                        option.textContent = `${modalidade.MODCOD} - ${modalidade.MODDES}`;
+                        select.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar modalidades:', error);
+                select.innerHTML = '<option value="">Erro ao carregar</option>';
+            });
+    }
+</script>

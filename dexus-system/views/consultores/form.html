@@ -1,0 +1,203 @@
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary" id="form-title">Novo Consultor</h6>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="form-consultor">
+                <div class="row">
+                    <!-- Campo código -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="CONCOD">Código:</label>
+                            <input type="text" class="form-control" id="CONCOD" name="CONCOD" readonly>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo nome -->
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="CONNOM">Nome:</label>
+                            <input type="text" class="form-control" id="CONNOM" name="CONNOM" maxlength="40">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo telefone -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="CONTEL">Telefone:</label>
+                            <input type="text" class="form-control phone-mask" id="CONTEL" name="CONTEL" maxlength="15" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo e-mail -->
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="CONEMA">E-mail:</label>
+                            <input type="email" class="form-control" id="CONEMA" name="CONEMA" maxlength="100">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <!-- Campo atuação -->
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="CONATU">Atuação:</label>
+                            <input type="text" class="form-control" id="CONATU" name="CONATU" maxlength="40">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo valor hora -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="CONVAL">Valor Hora:</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="text" class="form-control currency-mask" id="CONVAL" name="CONVAL">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para o formulário de consultor
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar validação
+        setupConsultorValidation();
+        
+        // Configurar máscaras
+        setupPhoneMask('CONTEL');
+        setupCurrencyMask('CONVAL');
+        
+        // Configurar botão de voltar
+        document.getElementById('btn-voltar').addEventListener('click', function() {
+            loadConsultoresContent();
+        });
+        
+        // Configurar envio do formulário
+        document.getElementById('form-consultor').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar formulário
+            if (!validateConsultorForm()) {
+                return;
+            }
+            
+            // Obter dados do formulário
+            const consultorId = document.getElementById('CONCOD').value;
+            const consultorData = {
+                CONNOM: document.getElementById('CONNOM').value,
+                CONTEL: document.getElementById('CONTEL').value,
+                CONEMA: document.getElementById('CONEMA').value,
+                CONATU: document.getElementById('CONATU').value,
+                CONVAL: document.getElementById('CONVAL').value.replace(/[^\d,.]/g, '').replace(',', '.')
+            };
+            
+            // Salvar consultor
+            if (consultorId) {
+                // Atualizar consultor existente
+                updateConsultor(consultorId, consultorData)
+                    .then(response => {
+                        if (response.success) {
+                            showAlert('Consultor atualizado com sucesso!', 'success');
+                            loadConsultoresContent();
+                        } else {
+                            showAlert('Erro ao atualizar consultor: ' + response.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        showAlert('Erro ao atualizar consultor: ' + error.message, 'danger');
+                    });
+            } else {
+                // Criar novo consultor
+                createConsultor(consultorData)
+                    .then(response => {
+                        if (response.success) {
+                            showAlert('Consultor cadastrado com sucesso!', 'success');
+                            loadConsultoresContent();
+                        } else {
+                            showAlert('Erro ao cadastrar consultor: ' + response.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        showAlert('Erro ao cadastrar consultor: ' + error.message, 'danger');
+                    });
+            }
+        });
+    });
+    
+    /**
+     * Carrega os dados de um consultor para edição
+     * @param {number} id ID do consultor
+     */
+    function loadConsultorData(id) {
+        // Atualizar título do formulário
+        document.getElementById('form-title').textContent = 'Editar Consultor';
+        
+        // Exibir loader
+        const btnSalvar = document.querySelector('button[type="submit"]');
+        const btnOriginalText = btnSalvar.innerHTML;
+        btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Carregando...';
+        btnSalvar.disabled = true;
+        
+        // Carregar dados do consultor
+        fetchConsultor(id)
+            .then(response => {
+                if (response.success) {
+                    const consultor = response.consultor;
+                    
+                    // Preencher formulário
+                    document.getElementById('CONCOD').value = consultor.CONCOD;
+                    document.getElementById('CONNOM').value = consultor.CONNOM;
+                    document.getElementById('CONTEL').value = consultor.CONTEL;
+                    document.getElementById('CONEMA').value = consultor.CONEMA;
+                    document.getElementById('CONATU').value = consultor.CONATU;
+                    
+                    // Formatar valor hora
+                    if (consultor.CONVAL) {
+                        const valor = parseFloat(consultor.CONVAL);
+                        document.getElementById('CONVAL').value = valor.toLocaleString('pt-BR', {
+                            style: 'currency',
+                            currency: 'BRL',
+                            minimumFractionDigits: 2
+                        });
+                    } else {
+                        document.getElementById('CONVAL').value = '';
+                    }
+                } else {
+                    showAlert('Erro ao carregar dados do consultor: ' + response.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao carregar dados do consultor: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                // Restaurar botão
+                btnSalvar.innerHTML = btnOriginalText;
+                btnSalvar.disabled = false;
+            });
+    }
+</script>

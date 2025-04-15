@@ -1,0 +1,141 @@
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary" id="form-title">Nova Modalidade</h6>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-voltar">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form id="form-modalidade">
+                <div class="row">
+                    <!-- Campo código -->
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="MODCOD">Código:</label>
+                            <input type="text" class="form-control" id="MODCOD" name="MODCOD" readonly>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo descrição -->
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label for="MODDES">Descrição:</label>
+                            <input type="text" class="form-control" id="MODDES" name="MODDES" maxlength="40">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Limpar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script específico para o formulário de modalidade
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar validação
+        setupModalidadeValidation();
+        
+        // Configurar botão de voltar
+        document.getElementById('btn-voltar').addEventListener('click', function() {
+            loadModalidadesContent();
+        });
+        
+        // Configurar envio do formulário
+        document.getElementById('form-modalidade').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validar formulário
+            if (!validateModalidadeForm()) {
+                return;
+            }
+            
+            // Obter dados do formulário
+            const modalidadeId = document.getElementById('MODCOD').value;
+            const modalidadeData = {
+                MODDES: document.getElementById('MODDES').value
+            };
+            
+            // Salvar modalidade
+            if (modalidadeId) {
+                // Atualizar modalidade existente
+                updateModalidade(modalidadeId, modalidadeData)
+                    .then(response => {
+                        if (response.success) {
+                            showAlert('Modalidade atualizada com sucesso!', 'success');
+                            loadModalidadesContent();
+                        } else {
+                            showAlert('Erro ao atualizar modalidade: ' + response.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        showAlert('Erro ao atualizar modalidade: ' + error.message, 'danger');
+                    });
+            } else {
+                // Criar nova modalidade
+                createModalidade(modalidadeData)
+                    .then(response => {
+                        if (response.success) {
+                            showAlert('Modalidade cadastrada com sucesso!', 'success');
+                            loadModalidadesContent();
+                        } else {
+                            showAlert('Erro ao cadastrar modalidade: ' + response.message, 'danger');
+                        }
+                    })
+                    .catch(error => {
+                        showAlert('Erro ao cadastrar modalidade: ' + error.message, 'danger');
+                    });
+            }
+        });
+    });
+    
+    /**
+     * Carrega os dados de uma modalidade para edição
+     * @param {number} id ID da modalidade
+     */
+    function loadModalidadeData(id) {
+        // Atualizar título do formulário
+        document.getElementById('form-title').textContent = 'Editar Modalidade';
+        
+        // Exibir loader
+        const btnSalvar = document.querySelector('button[type="submit"]');
+        const btnOriginalText = btnSalvar.innerHTML;
+        btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Carregando...';
+        btnSalvar.disabled = true;
+        
+        // Carregar dados da modalidade
+        fetchModalidade(id)
+            .then(response => {
+                if (response.success) {
+                    const modalidade = response.modalidade;
+                    
+                    // Preencher formulário
+                    document.getElementById('MODCOD').value = modalidade.MODCOD;
+                    document.getElementById('MODDES').value = modalidade.MODDES;
+                } else {
+                    showAlert('Erro ao carregar dados da modalidade: ' + response.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Erro ao carregar dados da modalidade: ' + error.message, 'danger');
+            })
+            .finally(() => {
+                // Restaurar botão
+                btnSalvar.innerHTML = btnOriginalText;
+                btnSalvar.disabled = false;
+            });
+    }
+</script>
